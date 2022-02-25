@@ -1,0 +1,9 @@
+POST http://localhost:8000/customer
+Accept: application/json
+
+{
+    "customer_id": "3",
+    "full_name": "Virendra Nath Behl",
+    "city": "Lucknow",
+    "phone": "80043xxxxx"
+}

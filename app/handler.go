@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -19,7 +18,7 @@ func greetHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "Hello world!!!")
 }
 
-func getAllCustomers(w http.ResponseWriter, req *http.Request) {
+func getAllCustomersHandler(w http.ResponseWriter, req *http.Request) {
 
 	if req.Header.Get("Content-Type") == "application/xml" {
 		w.Header().Add("Content-Type", "application/xml")
@@ -30,7 +29,7 @@ func getAllCustomers(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func getCustomerById(w http.ResponseWriter, req *http.Request) {
+func getCustomerByIdHandler(w http.ResponseWriter, req *http.Request) {
 	id := mux.Vars(req)["customer_id"]
 	for _, customer := range customers {
 		if customer.Id == string(id) {
@@ -44,4 +43,17 @@ func getCustomerById(w http.ResponseWriter, req *http.Request) {
 			break
 		}
 	}
+}
+
+func createCustomerHandler(w http.ResponseWriter, req *http.Request) {
+	var customerData CustomerDetails
+	json.NewDecoder(req.Body).Decode(&customerData)
+	for _, c := range customers {
+		if c.Id == customerData.Id {
+			json.NewEncoder(w).Encode(fmt.Sprintf("Customer with id [%v] already exists", customerData.Id))
+			return
+		}
+	}
+	customers = append(customers, customerData)
+	json.NewEncoder(w).Encode(customers)
 }
