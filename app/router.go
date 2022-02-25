@@ -6,8 +6,10 @@ import (
 )
 
 func Start() {
-	http.HandleFunc("/greet", greetHandler)
-	http.HandleFunc("/getAllCustomers", getAllCustomers)
+	router := http.NewServeMux()
 
-	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+	router.HandleFunc("/greet", greetHandler)
+	router.HandleFunc("/getAllCustomers", getAllCustomers)
+
+	log.Fatal(http.ListenAndServe("localhost:8000", router))
 }
