@@ -3,7 +3,6 @@ package app
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"net/http"
 
 	"github.com/dhruvbehl/bank/service"
@@ -18,20 +17,30 @@ type CustomerHandler struct {
 	service service.DefaultCustomerService
 }
 
+func writeResponse(w http.ResponseWriter, req *http.Request, code int, data interface{}) {
+	switch req.Header.Get("Content-Type") {
+	case "application/xml":
+		w.Header().Add("Content-Type", "application/xml")
+		w.WriteHeader(code)
+		if err := xml.NewEncoder(w).Encode(data); err != nil {
+			panic(err)
+		}
+	default:
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(code)
+		if err := json.NewEncoder(w).Encode(data); err != nil {
+			panic(err)
+		}
+	}
+}
+
 func (c *CustomerHandler) getAllCustomersHandler(w http.ResponseWriter, req *http.Request) {
 
 	customers, err := c.service.GetAllCustomer()
 	if err != nil {
-		w.WriteHeader(err.Code)
-		fmt.Fprint(w, err.Message)
+		writeResponse(w, req, err.Code, err)
 	} else {
-		if req.Header.Get("Content-Type") == "application/xml" {
-			w.Header().Add("Content-Type", "application/xml")
-			xml.NewEncoder(w).Encode(customers)
-		} else {
-			w.Header().Add("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(customers)
-		}
+		writeResponse(w, req, http.StatusOK, customers)
 	}
 }
 
@@ -39,16 +48,9 @@ func (c *CustomerHandler) getCustomerByIdHandler(w http.ResponseWriter, req *htt
 	id := mux.Vars(req)["customer_id"]
 	customer, err := c.service.GetCustomerById(id)
 	if err != nil {
-		w.WriteHeader(err.Code)
-		fmt.Fprint(w, err.Message)
+		writeResponse(w, req, err.Code, err)
 	} else {
-		if req.Header.Get("Content-Type") == "application/xml" {
-			w.Header().Add("Content-Type", "application/xml")
-			xml.NewEncoder(w).Encode(customer)
-		} else {
-			w.Header().Add("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(customer)
-		}
+		writeResponse(w, req, http.StatusOK, customer)
 	}
 }
 
