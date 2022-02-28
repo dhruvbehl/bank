@@ -1,11 +1,22 @@
 package domain
 
+import "fmt"
+
 type CustomerRepositoryStub struct {
 	customer []Customer
 }
 
 func (s CustomerRepositoryStub) FindAll() ([]Customer, error) {
 	return s.customer, nil
+}
+
+func (s CustomerRepositoryStub) FinById(id string) (Customer, error) {
+	for _, c := range s.customer {
+		if c.Id == id {
+			return c, nil
+		}
+	}
+	return Customer{}, fmt.Errorf("no customer found with id [%v]", id)
 }
 
 func NewCustomerRepositoryStub() CustomerRepositoryStub {

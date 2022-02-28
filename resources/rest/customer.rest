@@ -6,11 +6,17 @@ GET http://localhost:8000/getAllCustomers
 Content-Type: application/xml
 
 ###
-GET http://localhost:8000/getCustomerById/2
+GET http://localhost:8000/getCustomerById/2000
+
+###
+GET http://localhost:8000/getCustomerById/2001
+Content-Type: application/xml
 
 ###
 GET http://localhost:8000/getCustomerById/1
-Content-Type: application/xml
+
+###
+GET http://localhost:8000/getCustomerById/one
 
 ###
 POST http://localhost:8000/customer

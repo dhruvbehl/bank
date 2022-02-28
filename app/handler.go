@@ -3,9 +3,11 @@ package app
 import (
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"net/http"
 
 	"github.com/dhruvbehl/bank/service"
+	"github.com/gorilla/mux"
 )
 
 // func greetHandler(w http.ResponseWriter, req *http.Request) {
@@ -18,31 +20,37 @@ type CustomerHandler struct {
 
 func (c *CustomerHandler) getAllCustomersHandler(w http.ResponseWriter, req *http.Request) {
 
-	customers, _ := c.service.GetAllCustomer()
-	if req.Header.Get("Content-Type") == "application/xml" {
-		w.Header().Add("Content-Type", "application/xml")
-		xml.NewEncoder(w).Encode(customers)
+	customers, err := c.service.GetAllCustomer()
+	if err != nil {
+		w.WriteHeader(err.Code)
+		fmt.Fprint(w, err.Message)
 	} else {
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(customers)
+		if req.Header.Get("Content-Type") == "application/xml" {
+			w.Header().Add("Content-Type", "application/xml")
+			xml.NewEncoder(w).Encode(customers)
+		} else {
+			w.Header().Add("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(customers)
+		}
 	}
 }
 
-// func getCustomerByIdHandler(w http.ResponseWriter, req *http.Request) {
-// 	id := mux.Vars(req)["customer_id"]
-// 	for _, customer := range customers {
-// 		if customer.Id == string(id) {
-// 			if req.Header.Get("Content-Type") == "application/xml" {
-// 				w.Header().Add("Content-Type", "application/xml")
-// 				xml.NewEncoder(w).Encode(customer)
-// 			} else {
-// 				w.Header().Add("Content-Type", "application/json")
-// 				json.NewEncoder(w).Encode(customer)
-// 			}
-// 			break
-// 		}
-// 	}
-// }
+func (c *CustomerHandler) getCustomerByIdHandler(w http.ResponseWriter, req *http.Request) {
+	id := mux.Vars(req)["customer_id"]
+	customer, err := c.service.GetCustomerById(id)
+	if err != nil {
+		w.WriteHeader(err.Code)
+		fmt.Fprint(w, err.Message)
+	} else {
+		if req.Header.Get("Content-Type") == "application/xml" {
+			w.Header().Add("Content-Type", "application/xml")
+			xml.NewEncoder(w).Encode(customer)
+		} else {
+			w.Header().Add("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(customer)
+		}
+	}
+}
 
 // func createCustomerHandler(w http.ResponseWriter, req *http.Request) {
 // 	var customerData CustomerDetails
