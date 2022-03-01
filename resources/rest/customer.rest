@@ -19,6 +19,9 @@ GET http://localhost:8000/getCustomerById/1
 GET http://localhost:8000/getCustomerById/one
 
 ###
+GET http://localhost:8000/getAllCustomers?status=inactive
+
+###
 POST http://localhost:8000/customer
 Accept: application/json
 

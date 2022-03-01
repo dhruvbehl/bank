@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
+	"strings"
 
+	"github.com/dhruvbehl/bank/domain"
+	"github.com/dhruvbehl/bank/errors"
 	"github.com/dhruvbehl/bank/service"
 	"github.com/gorilla/mux"
 )
@@ -35,8 +38,19 @@ func writeResponse(w http.ResponseWriter, req *http.Request, code int, data inte
 }
 
 func (c *CustomerHandler) getAllCustomersHandler(w http.ResponseWriter, req *http.Request) {
-
-	customers, err := c.service.GetAllCustomer()
+	status := req.URL.Query()["status"]
+	var customers []domain.Customer
+	var err *errors.AppError
+	if len(status) < 1 {
+		customers, err = c.service.GetAllCustomer()
+	} else {
+		if strings.EqualFold(status[0], "active") ||  strings.EqualFold(status[0], "inactive") {
+			customers, err = c.service.GetCustomerByStatus(status[0])
+		} else {
+			err := errors.NewBadRequestError("query parameter status only accepts [active | inactive]")
+			writeResponse(w, req, err.Code, err.Message)
+		}
+	}
 	if err != nil {
 		writeResponse(w, req, err.Code, err)
 	} else {

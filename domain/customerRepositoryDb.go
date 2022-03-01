@@ -3,10 +3,10 @@ package domain
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/dhruvbehl/bank/errors"
+	"github.com/dhruvbehl/bank/logger"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -18,7 +18,7 @@ func (d CustomerRepositoryDb) FindAll() ([]Customer, *errors.AppError) {
 	sqlQuery := "select * from customers"
 	rows, err := d.client.Query(sqlQuery)
 	if err != nil {
-		log.Default().Printf("er ror while querying db: %v\n", err.Error())
+		logger.Error(fmt.Sprintf("[error while querying db] %v", err.Error()))
 		return nil, errors.NewInternalServerError("unexpected database error")
 	}
 
@@ -27,12 +27,12 @@ func (d CustomerRepositoryDb) FindAll() ([]Customer, *errors.AppError) {
 		var c Customer
 		err := rows.Scan(&c.Id, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
 		if err != nil {
-			log.Default().Printf("error while scanning results: %v\n", err.Error())
+			logger.Error(fmt.Sprintf("[error while scanning results] %v",err.Error()))
 			return nil, errors.NewInternalServerError("error while scanning results")
 		}
 		customers = append(customers, c)
 	}
-	log.Default().Println("returning results for FindAll query")
+	logger.Info("returning results for FindAll query")
 	return customers, nil
 }
 
@@ -44,14 +44,35 @@ func (d CustomerRepositoryDb) FindById(id string) (*Customer, *errors.AppError) 
 	err := row.Scan(&c.Id, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Default().Printf("error while scanning results: %v\n", err.Error())
+			logger.Error(fmt.Sprintf("[error while scanning results] %v",err.Error()))
 			return nil, errors.NewNotFoundError("customer not found")
 		}
-		log.Default().Printf("error while scanning results: %v\n", err.Error())
+		logger.Error(fmt.Sprintf("[error while scanning results] %v",err.Error()))
 		return nil, errors.NewInternalServerError("unexpected database error")
 	}
-	log.Default().Println("returning results for FindById query")
+	logger.Info("returning results for FindById query")
 	return &c, nil
+}
+
+func (d CustomerRepositoryDb) FindByStatus(status string) ([]Customer, *errors.AppError) {
+	sqlQuery := fmt.Sprintf("SELECT * FROM customers where status=%v", status)
+	rows, err := d.client.Query(sqlQuery)
+	if err != nil {
+		logger.Error(fmt.Sprintf("[error while querying db] %v", err.Error()))
+		return nil, errors.NewInternalServerError("unexpected database error")
+	}
+	customers := make([]Customer, 0)
+	for rows.Next() {
+		var c Customer
+		err = rows.Scan(&c.Id, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
+		if err != nil {
+			logger.Error(fmt.Sprintf("[error while scanning results] %v",err.Error()))
+			return nil, errors.NewInternalServerError("error while scanning results")
+		}
+		customers = append(customers, c)
+	}
+	logger.Info("returning results for FindByStatus query")
+	return customers, nil
 }
 
 func NewCustomerRepositoryDb() CustomerRepositoryDb {
