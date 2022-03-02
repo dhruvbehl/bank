@@ -1,8 +1,10 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/dhruvbehl/bank/domain"
 	"github.com/dhruvbehl/bank/service"
@@ -10,6 +12,12 @@ import (
 )
 
 func Start() {
+	host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
+
+	if host == "" || port == "" {
+		panic("Application needs HOST and PORT as environment variables")
+	}
 	router := mux.NewRouter()
 
 	// ch := CustomerHandler{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
@@ -18,5 +26,5 @@ func Start() {
 	router.HandleFunc("/getCustomerById/{customer_id:[0-9]+}", ch.getCustomerByIdHandler).Methods(http.MethodGet)
 	// router.HandleFunc("/customer", createCustomerHandler).Methods(http.MethodPost)
 
-	log.Fatal(http.ListenAndServe("localhost:8000", router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%v:%v", host, port), router))
 }
