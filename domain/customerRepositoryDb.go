@@ -29,8 +29,8 @@ func (d CustomerRepositoryDb) FindAll() ([]Customer, *errors.AppError) {
 
 func (d CustomerRepositoryDb) FindById(id string) (*Customer, *errors.AppError) {
 	c := Customer{}
-	sqlQuery := fmt.Sprintf("select * from customers where customer_id=%v", id)
-	err := d.client.Get(&c, sqlQuery)
+	sqlQuery := "select * from customers where customer_id=?"
+	err := d.client.Get(&c, sqlQuery, id)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -46,7 +46,7 @@ func (d CustomerRepositoryDb) FindById(id string) (*Customer, *errors.AppError) 
 
 func (d CustomerRepositoryDb) FindByStatus(status string) ([]Customer, *errors.AppError) {
 	customers := make([]Customer, 0)
-	sqlQuery := "SELECT * FROM customers where status=$1"
+	sqlQuery := "SELECT * FROM customers where status=?"
 	err := d.client.Select(&customers, sqlQuery, status)
 	if err != nil {
 		logger.Error(fmt.Sprintf("[error while scanning results] %v",err.Error()))

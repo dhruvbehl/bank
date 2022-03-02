@@ -10,3 +10,16 @@ type Environment struct {
 	DBNAME string
 	LOGPATH string
 }
+
+func NewEnvironment(host, port, dbUsername, dbPassword, dbHost, dbPort, dbName, logPath string) Environment {
+	return Environment{
+		HOST:       host,
+		PORT:       port,
+		DBUSERNAME: dbUsername,
+		DBPASSWORD: dbPassword,
+		DBHOST:     dbHost,
+		DBPORT:     dbPort,
+		DBNAME:     dbName,
+		LOGPATH:    logPath,
+	}
+}

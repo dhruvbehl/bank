@@ -22,16 +22,7 @@ func main() {
 		panic("Application needs HOST, PORT, DBUSERNAME, DBPASSWORD, DBHOST, DBPORT & DBNAME as environment variables")
 	}
 
-	envVar := domain.Environment{
-		HOST:       host,
-		PORT:       port,
-		DBUSERNAME: dbUsername,
-		DBPASSWORD: dbPassword,
-		DBHOST:     dbHost,
-		DBPORT:     dbPort,
-		DBNAME:     dbName,
-		LOGPATH:    logPath,
-	}
+	envVar := domain.NewEnvironment(host, port, dbUsername, dbPassword, dbHost, dbPort, dbName, logPath)
 
 	logger.Init(logPath)
 	logger.Info("Starting application")
