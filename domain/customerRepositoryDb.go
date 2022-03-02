@@ -56,8 +56,9 @@ func (d CustomerRepositoryDb) FindByStatus(status string) ([]Customer, *errors.A
 	return customers, nil
 }
 
-func NewCustomerRepositoryDb() CustomerRepositoryDb {
-	client, err := sqlx.Open("mysql", "root:qs@tcp(localhost:3306)/banking")
+func NewCustomerRepositoryDb(envVar Environment) CustomerRepositoryDb {
+	dataSource := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", envVar.DBUSERNAME, envVar.DBPASSWORD, envVar.DBHOST, envVar.DBPORT, envVar.DBNAME)
+	client, err := sqlx.Open("mysql", dataSource)
 	if err != nil {
 		panic(err)
 	}
