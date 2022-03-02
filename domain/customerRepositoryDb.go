@@ -46,7 +46,7 @@ func (d CustomerRepositoryDb) FindById(id string) (*Customer, *errors.AppError) 
 
 func (d CustomerRepositoryDb) FindByStatus(status string) ([]Customer, *errors.AppError) {
 	customers := make([]Customer, 0)
-	sqlQuery := fmt.Sprintf("SELECT * FROM customers where status=$1")
+	sqlQuery := "SELECT * FROM customers where status=$1"
 	err := d.client.Select(&customers, sqlQuery, status)
 	if err != nil {
 		logger.Error(fmt.Sprintf("[error while scanning results] %v",err.Error()))
