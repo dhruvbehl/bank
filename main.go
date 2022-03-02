@@ -8,6 +8,6 @@ import (
 func main() {
 	logPath := ""
 	logger.Init(logPath)
-	logger.Info("Staring application")
+	logger.Info("Starting application")
 	app.Start()
 }

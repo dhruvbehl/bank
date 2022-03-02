@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dhruvbehl/bank/domain"
+	"github.com/dhruvbehl/bank/dto"
 	"github.com/dhruvbehl/bank/errors"
 	"github.com/dhruvbehl/bank/service"
 	"github.com/gorilla/mux"
@@ -39,7 +39,7 @@ func writeResponse(w http.ResponseWriter, req *http.Request, code int, data inte
 
 func (c *CustomerHandler) getAllCustomersHandler(w http.ResponseWriter, req *http.Request) {
 	status := req.URL.Query()["status"]
-	var customers []domain.Customer
+	var customers []dto.CustomerResponse
 	var err *errors.AppError
 	if len(status) < 1 {
 		customers, err = c.service.GetAllCustomer()

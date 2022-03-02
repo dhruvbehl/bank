@@ -1,14 +1,36 @@
 package domain
 
-import "github.com/dhruvbehl/bank/errors"
+import (
+	"strconv"
+
+	"github.com/dhruvbehl/bank/dto"
+	"github.com/dhruvbehl/bank/errors"
+)
 
 type Customer struct {
-	Id          string `json:"customer_id"`
-	Name        string `json:"full_name"`
-	City        string `json:"city"`
-	Zipcode     string `json:"zipcode"`
-	DateOfBirth string `json:"date_of_birth"`
-	Status      string `json:"status"`
+	Id          string `db:"customer_id"`
+	Name        string
+	City        string
+	Zipcode     string
+	DateOfBirth string `db:"date_of_birth"`
+	Status      string
+}
+
+func (c Customer) GetCustomerDto() *dto.CustomerResponse {
+	return &dto.CustomerResponse{
+		Id:          c.Id,
+		Name:        c.Name,
+		City:        c.City,
+		Zipcode:     c.Zipcode,
+		DateOfBirth: c.DateOfBirth,
+		Status:      c.getStatus(),
+	}
+}
+
+func (c Customer) getStatus() string {
+	statusString := []string{"inactive", "active"}
+	statusInt, _ := strconv.Atoi(c.Status)
+	return statusString[statusInt]
 }
 
 type CustomerRepository interface {
